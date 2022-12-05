@@ -1,0 +1,28 @@
+name: Scrape latest List N, create DB, and publish to Vercel
+
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron:  '57 5,14,20,23 * * *' # 1:57AM, 10:57AM, 4:57PM, 7:57PM 
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out this repo
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |-
+        sudo apt-get update && sudo apt-get -y install jq python3-pip
+        python3 -m pip install --user -U pip
+        python3 -m pip install --user -r requirements.txt
+
+    - name: Fetch latest data
+      run: |-
+        epa_json_data=$(curl --tls-max 1.2 "https://cfpub.epa.gov/wizards/disinfectants/includes/queries.cfc?method=getDisData&Keyword=&RegNum=&ActiveIng=All&ContactTime=&UseSite=&SurfType=" 2>/dev/null)
+        echo "${epa_json_data}" | jq --monochrome-output . >list-N.json
+        echo "${epa_json_data}" | python3 transform.py | jq --monochrome-output . >list-N.transformed.json
+
+ 
