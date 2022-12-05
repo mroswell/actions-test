@@ -8,7 +8,7 @@ on:
 
 jobs:
   scheduled:
-    runs-on: ubuntu-20.04 #ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
     - name: Check out this repo
       uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
 
     - name: Fetch latest data
       run: |-
-        epa_json_data=$(curl "https://cfpub.epa.gov/wizards/disinfectants/includes/queries.cfc?method=getDisData&Keyword=&RegNum=&ActiveIng=All&ContactTime=&UseSite=&SurfType=" 2>/dev/null)
+        epa_json_data=$(curl "https://cfpub.epa.gov/wizards/disinfectants/includes/queries.cfc?method=getDisData&Keyword=&RegNum=&ActiveIng=All&ContactTime=&UseSite=&SurfType=")
         echo "${epa_json_data}" | jq --monochrome-output . >list-N.json
         echo "${epa_json_data}" | python3 transform.py | jq --monochrome-output . >list-N.transformed.json 
 
